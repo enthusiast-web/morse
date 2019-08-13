@@ -16,3 +16,23 @@ export const defLow = () => dispatch => {
     type: "DEF_LOW"
   });
 };
+
+export const changeSpeed = value => dispatch => {
+  dispatch({
+    type: "CHANGE_SPEED",
+    payload: value
+  });
+};
+
+export const changeGain = value => dispatch => {
+  dispatch({
+    type: "CHANGE_GAIN",
+    payload: value
+  });
+};
+
+export const playLang = () => dispatch => {
+  dispatch({
+    type: "PLAY_LANG"
+  });
+};

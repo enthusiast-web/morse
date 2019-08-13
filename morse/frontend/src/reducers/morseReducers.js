@@ -6,6 +6,8 @@ const initialState = {
   space: "",
   lista: [],
   oscillator: "",
+  speed: 90,
+  volume: 0.9,
   letras: {
     "0": "-----",
     "1": ".----",
@@ -57,25 +59,43 @@ const initialState = {
   //   feedback live , tem q ser separado do resto da traduçao, para os espaços serem certos
   //  e o feedback ao vivo tbm
   control: [],
-  trans_control: ""
+  trans_control: "",
+  gain: ""
 };
 
 // IMPORTANTE : espaço entre letras=450 ,entre palavras =1050,tempo do ponto =150 da barra 300
 export default function(state = initialState, action, dispatch) {
   switch (action.type) {
+    case "CHANGE_SPEED":
+      return {
+        ...state,
+        speed: action.payload
+      };
+    case "CHANGE_GAIN":
+      return {
+        ...state,
+        volume: action.payload
+      };
     case "CREATE_CTX":
       var audioCtx = state.audioCtx;
+
+      var gain = state.audioCtx.createGain();
+      gain.gain.value = state.volume;
+      gain.connect(audioCtx.destination);
       var oscillator = audioCtx.createOscillator();
 
-      oscillator.type = "square";
-      oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // value in hertz
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime); // value in hertz
       oscillator.start();
 
-      return { ...state, oscillator: oscillator };
+      return { ...state, oscillator: oscillator, gain: gain };
     //conecta o oscilator ao audixo.ctx.destination
     case "DEF_HIGH":
       var oscillator = state.oscillator;
-      oscillator.connect(state.audioCtx.destination);
+      state.gain.gain.value = state.volume;
+
+      oscillator.connect(state.gain);
+      oscillator.detune.setValueAtTime(0, state.audioCtx.currentTime);
       // vendo o espaçamento
       var space = "";
       var start = Date.now();
@@ -93,7 +113,10 @@ export default function(state = initialState, action, dispatch) {
     //desconecta o oscilator ao audixo.ctx.destination
     case "DEF_LOW":
       var oscillator = state.oscillator;
-      oscillator.disconnect(state.audioCtx.destination);
+      state.gain.gain.value = state.volume;
+
+      oscillator.disconnect(state.gain);
+      oscillator.detune.setValueAtTime(0, state.audioCtx.currentTime);
       var end = Date.now();
       // antigo "DEF_SIZE"
       // define se é . ou -  e coloca os espaços de palavra ,letra e entre .e _ das letras
@@ -130,17 +153,11 @@ export default function(state = initialState, action, dispatch) {
           index.push(control), (control = []);
         }
       });
-      console.log(control);
+
       // index = index.slice(1, index.length + 1);
       // converte uma array  de ['.','.','.'] para ['...']
 
-      index = index.map(obj =>
-        obj
-          //   .join()
-          //   .split(",")
-          .join("")
-      );
-      //   console.log(index);
+      index = index.map(obj => obj.join(""));
 
       index.map(obj => {
         for (var i in state.letras) {

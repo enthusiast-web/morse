@@ -1,26 +1,29 @@
 import React, { Component } from "react";
-import { object } from "prop-types";
+import Volume from "./Volume";
 import { defHigh, defLow, createCTX } from "../actions/morseActions";
 import { connect } from "react-redux";
+import Speed from "./Speed";
 class Morse extends Component {
   componentDidMount() {
     console.log(this.props.morse);
 
     document.addEventListener("keypress", e => {
-      if (e.key !== "Tab" && e.key !== "Alt") {
+      if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
         // o audioCTX é criado somente se o no state do redux audio ctx for null (!audioCtx)
         if (!this.props.morse.oscillator) {
           this.props.createCTX();
         }
-        // impede o evento de dar trigger em defHIgh se a telca ja tiver sido apertada
+        // impede o evento de dar trigger em defHIgh se a tleca ja tiver sido apertada
         // o evento defLow usa os dados do start e o define como 0 novamente
         if (this.props.morse.start === 0) {
           this.props.defHigh();
         }
       }
     });
-    document.addEventListener("keyup", () => {
-      setTimeout(() => this.props.defLow(), 50);
+    document.addEventListener("keyup", e => {
+      if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
+        setTimeout(() => this.props.defLow(), 50);
+      }
     });
   }
 
@@ -28,22 +31,26 @@ class Morse extends Component {
     return (
       <div>
         <div
-          style={{ width: "100px" }}
+          style={{ width: "100%", fontSize: "35px" }}
           onClick={() => {
             this.props.createCTX();
           }}
         >
           realize o codigo morse com a barra de espaço
         </div>
-        <div>
-          <p style={{ fontSize: 55 }}>{this.props.morse.lista}</p>
+        <div style={{ width: "100%", minHeight: 300 }}>
+          <div>
+            <p style={{ fontSize: 55 }}>{this.props.morse.lista}</p>
+          </div>
+          <div>
+            <p style={{ fontSize: 55 }}>
+              {this.props.morse.translate}
+              {this.props.morse.trans_control}
+            </p>
+          </div>
         </div>
-        <div>
-          <p style={{ fontSize: 55 }}>
-            {this.props.morse.translate}
-            {this.props.morse.trans_control}
-          </p>
-        </div>
+        <Volume />
+        <Speed />
       </div>
     );
   }
