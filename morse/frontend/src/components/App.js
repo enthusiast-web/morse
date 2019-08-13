@@ -4,22 +4,26 @@ import ReactDOM from "react-dom";
 
 import { Provider } from "react-redux";
 import store from "../store";
-import Morse from './Morse'
+
+
+import AppRouter from "./appRouter";
 export class App extends Component {
   render() {
     return (
       <div>
         <Provider store={store}>
-
-
-        <Morse></Morse>
-
+          <AppRouter />
         </Provider>
       </div>
     );
-  }
-}
+    }}
 
 export default App;
 
 ReactDOM.render(<App />, document.getElementById("app"));
+
+
+
+    
+
+

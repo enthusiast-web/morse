@@ -1,14 +1,14 @@
 const initialState = {
-    displaySize: 550
+    displaySize: 150
 };
-export default function (state = initialState, action, dispatch) {
+export default function(state = initialState, action, dispatch) {
     switch (action.type) {
-        case "CHANGE_DISPLAY_SIZE":
-            return {
-                ...state,
-                displaySize: action.payload
-            };
-        default:
-            return state;
-    }
-}
+      case "CHANGE_SPEED":
+        console.log(action.payload);
+        return {
+          ...state,
+          speed: action.payload
+        };
+      default:
+        return state;
+    }}

@@ -1,7 +1,7 @@
 import { combineReducers } from "redux";
 import morseReducers from "./morseReducers";
-import uiReducer from "./uiReducers";
+import uiReducers from "./uiReducers";
 export default combineReducers({
   morseReducers,
-  uiReducer
+  uiReducers
 });
