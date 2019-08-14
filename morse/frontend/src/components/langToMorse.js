@@ -12,66 +12,76 @@ class langToMorse extends Component {
   state = {
     texto: "",
     lista: [],
-
+    total: 0,
     lista_normal: []
   };
   onChange = e => {
     this.setState({ [e.target.name]: e.target.value });
   };
-  // esta retorando uma aray pq dois metodos utilizam esse retun
+  // esta retorando uma array pq dois metodos utilizam esse return
   // e como está direto no render nao pode mexer no state
   ChangeLista = () => {
     var lista = [];
     var lista_normal = [];
     [...this.state.texto].map((obj, ind) => {
       if (obj === " ") {
-        lista_normal = [...lista_normal, "  /  "];
+        lista_normal = [...lista_normal, " / "];
         lista = [...lista, ["  /  "]];
       }
       for (var i in this.props.morse.letras) {
         if (obj === i) {
-          lista_normal = [...lista_normal, "  ", this.props.morse.letras[i]];
+          lista_normal = [...lista_normal, " ", this.props.morse.letras[i]];
           lista = [...lista, ["  " + this.props.morse.letras[i], " " + i]];
         }
       }
     });
-
+    // console.log(lista_normal);
     return [lista_normal, lista];
   };
   play = () => {
     var lista = this.ChangeLista()[0];
-    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    var oscillator = audioCtx.createOscillator();
-    oscillator.type = "square";
-    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // value in hertz
 
-    var gain = audioCtx.createGain();
-    gain.gain.value = this.props.morse.volume;
-    gain.connect(audioCtx.destination);
-
-    oscillator.start();
     lista = lista.map(obj => obj.split(""));
     lista = lista.join(",");
+    var total = 0;
+    console.log(this.props.morse.end, Date.now());
 
-    [...lista].map((obj, ind) => {
-      if (!this.props.morse.oscillator) {
-        this.props.createCTX();
-      }
-      setTimeout(() => {
-        gain.gain.value = this.props.morse.volume;
+    if (this.state.total === 0) {
+      this.props.createCTX();
+      console.log("STARTTT");
+      [...lista].map((obj, ind) => {
         if (obj === "-") {
-          this.props.defHigh();
+          setTimeout(() => {
+            this.props.defHigh();
+          }, total);
           setTimeout(() => {
             this.props.defLow();
-          }, this.props.morse.speed * 6);
-        } else if (obj === ".") {
-          this.props.defHigh();
-          setTimeout(() => {
-            this.props.defLow();
-          }, this.props.morse.speed);
+          }, total + Number(this.props.morse.speed) * 3);
+          total += Number(this.props.morse.speed) * 3;
         }
-      }, ind * this.props.morse.speed * 2);
-    });
+        if (obj === ".") {
+          setTimeout(() => {
+            this.props.defHigh();
+          }, total);
+          setTimeout(() => {
+            this.props.defLow();
+          }, total + Number(this.props.morse.speed));
+          total += Number(this.props.morse.speed);
+        }
+        if (obj === " ") {
+          total += Number(this.props.morse.speed) * 1;
+        }
+
+        if (obj === ",") {
+          total += Number(this.props.morse.speed) * 1;
+        }
+        this.setState({ total: total });
+      });
+      // limita o numero de veze que da pra rodas esse metodo 
+      setTimeout(() => {
+        this.setState({ total: 0 });
+      }, total);
+    }
   };
 
   getColor = ind => {
@@ -85,7 +95,7 @@ class langToMorse extends Component {
   render() {
     return (
       <div>
-        <Speed />
+        {/* <Speed /> */}
         <div style={{ width: 300, height: 100 }}>
           <input
             onChange={this.onChange}
@@ -121,7 +131,7 @@ class langToMorse extends Component {
         <div>{}</div>
         <button onClick={() => this.play()}> play</button>
 
-        <Volume />
+        {/* <Volume /> */}
       </div>
     );
   }

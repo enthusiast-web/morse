@@ -36,3 +36,8 @@ export const playLang = () => dispatch => {
     type: "PLAY_LANG"
   });
 };
+export const resetLista = () => dispatch => {
+  dispatch({
+    type: "RESET"
+  });
+};

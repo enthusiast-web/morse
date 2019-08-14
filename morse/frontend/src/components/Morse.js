@@ -49,8 +49,8 @@ class Morse extends Component {
             </p>
           </div>
         </div>
-        <Volume />
-        <Speed />
+        {/* <Volume />
+        <Speed /> */}
       </div>
     );
   }

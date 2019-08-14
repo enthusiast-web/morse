@@ -2,11 +2,11 @@ const initialState = {
   audioCtx: new (window.AudioContext || window.webkitAudioContext)(),
 
   start: 0,
-  end: "",
+  end: 0,
   space: "",
   lista: [],
   oscillator: "",
-  speed: 90,
+  speed: 100,
   volume: 0.9,
   letras: {
     "0": "-----",
@@ -76,6 +76,14 @@ export default function(state = initialState, action, dispatch) {
         ...state,
         volume: action.payload
       };
+    case "RESET":
+      return {
+        ...state,
+        trans_control: "",
+        translate: "",
+        control: [],
+        lista: []
+      };
     case "CREATE_CTX":
       var audioCtx = state.audioCtx;
 
@@ -100,10 +108,10 @@ export default function(state = initialState, action, dispatch) {
       var space = "";
       var start = Date.now();
 
-      if (start - state.end >= 1050) {
+      if (start - state.end >= state.speed * 7) {
         var space = "word";
       } else {
-        if (start - state.end >= 450) {
+        if (start - state.end >= state.speed * 3) {
           var space = "letter";
         }
       }
@@ -160,15 +168,15 @@ export default function(state = initialState, action, dispatch) {
       index = index.map(obj => obj.join(""));
 
       index.map(obj => {
-        for (var i in state.letras) {
-          if (obj === state.letras[i]) {
-            if (state.space === "word") {
-              translate = translate.concat(i, " ");
-            } else {
-              translate = translate.concat(i);
+          for (var i in state.letras) {
+            if (obj === state.letras[i]) {
+              if (state.space === "word") {
+                translate = translate.concat(i, " ");
+              } else {
+                translate = translate.concat(i);
+              }
             }
           }
-        }
       });
       //   translate control
       var trans_control = "";
