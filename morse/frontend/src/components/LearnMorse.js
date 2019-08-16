@@ -13,7 +13,7 @@ class LearnMorse extends Component {
     int: 0,
     set: "",
     key: "",
-    dificuldade: [+2, -2]
+    dificuldade: 10
   };
   componentDidUpdate() {
     this.state.cm.map((obj, ind) => {
@@ -64,17 +64,17 @@ class LearnMorse extends Component {
       console.log(
         this.state.start - this.state.end,
         this.props.morse.speed * 3 -
-          this.props.morse.speed * this.state.dificuldade[0],
-        this.props.morse.speed * 3 -
-          this.props.morse.speed * this.state.dificuldade[1]
+          this.props.morse.speed * this.state.dificuldade,
+        this.props.morse.speed * 3 +
+          this.props.morse.speed * this.state.dificuldade
       );
       if (
         (this.state.start - this.state.end >
           this.props.morse.speed * 3 -
-            this.props.morse.speed * this.state.dificuldade[0] &&
+            this.props.morse.speed * this.state.dificuldade &&
           this.state.start - this.state.end <
-            this.props.morse.speed * 3 -
-              this.props.morse.speed * this.state.dificuldade[1]) ||
+            this.props.morse.speed * 3 +
+              this.props.morse.speed * this.state.dificuldade) ||
         this.state.start - this.state.end > 150000000
       ) {
         if (
@@ -93,17 +93,19 @@ class LearnMorse extends Component {
         if (
           this.state.end - this.state.start >
             this.props.morse.speed * 3 -
-              this.props.morse.speed * this.state.dificuldade[0] &&
+              this.props.morse.speed * this.state.dificuldade &&
           this.state.end - this.state.start <
-            this.props.morse.speed * 3 -
-              this.props.morse.speed * this.state.dificuldade[1]
+            this.props.morse.speed * 3 +
+              this.props.morse.speed * this.state.dificuldade
         ) {
+          console.log("---------------");
           this.setState({ lista: [...this.state.lista, "-"] });
         } else if (
           this.state.end - this.state.start <
-          this.props.morse.speed -
-            this.props.morse.speed * this.state.dificuldade[1]
+          this.props.morse.speed +
+            this.props.morse.speed * this.state.dificuldade
         ) {
+          console.log("......");
           this.setState({ lista: [...this.state.lista, "."] });
         }
         this.setState({ set: false, int: 0 });
@@ -129,6 +131,7 @@ class LearnMorse extends Component {
     this.setState({ learn: learn });
   };
   onChange = e => {
+    console.log(e.target.name, e.target.value);
     this.setState({ [e.target.name]: e.target.value });
   };
   render() {
@@ -141,12 +144,12 @@ class LearnMorse extends Component {
             // multiple={true}
             value={this.state.dificuldade}
             onChange={this.onChange}
-            // name={this.state.dificuldade}
+            name="dificuldade"
           >
-            <option value="[10,-10]">kid mode</option>
-            <option value="[3,-3]">facil</option>
-            <option value="[2,-2]">medio</option>
-            <option value="[1,-1]">dificil</option>
+            <option value={10}>kid mode</option>
+            <option value={3}>facil</option>
+            <option value={2}>medio</option>
+            <option value={1}>dificil</option>
           </select>
         </div>
 
