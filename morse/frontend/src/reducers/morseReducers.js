@@ -82,7 +82,9 @@ export default function(state = initialState, action, dispatch) {
         trans_control: "",
         translate: "",
         control: [],
-        lista: []
+        lista: [],
+        end: 0,
+        start: 0
       };
     case "CREATE_CTX":
       var audioCtx = state.audioCtx;
@@ -103,7 +105,7 @@ export default function(state = initialState, action, dispatch) {
       state.gain.gain.value = state.volume;
 
       oscillator.connect(state.gain);
-      oscillator.detune.setValueAtTime(0, state.audioCtx.currentTime);
+      // oscillator.detune.setValueAtTime(0, state.audioCtx.currentTime);
       // vendo o espaçamento
       var space = "";
       var start = Date.now();
@@ -124,7 +126,7 @@ export default function(state = initialState, action, dispatch) {
       state.gain.gain.value = state.volume;
 
       oscillator.disconnect(state.gain);
-      oscillator.detune.setValueAtTime(0, state.audioCtx.currentTime);
+      // oscillator.detune.setValueAtTime(0, state.audioCtx.currentTime);
       var end = Date.now();
       // antigo "DEF_SIZE"
       // define se é . ou -  e coloca os espaços de palavra ,letra e entre .e _ das letras
@@ -168,15 +170,15 @@ export default function(state = initialState, action, dispatch) {
       index = index.map(obj => obj.join(""));
 
       index.map(obj => {
-          for (var i in state.letras) {
-            if (obj === state.letras[i]) {
-              if (state.space === "word") {
-                translate = translate.concat(i, " ");
-              } else {
-                translate = translate.concat(i);
-              }
+        for (var i in state.letras) {
+          if (obj === state.letras[i]) {
+            if (state.space === "word") {
+              translate = translate.concat(i, " ");
+            } else {
+              translate = translate.concat(i);
             }
           }
+        }
       });
       //   translate control
       var trans_control = "";

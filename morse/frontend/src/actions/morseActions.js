@@ -41,3 +41,16 @@ export const resetLista = () => dispatch => {
     type: "RESET"
   });
 };
+
+export const setContext = () => dispatch => {
+  dispatch({
+    type: "SET_CONTEXT"
+  });
+};
+
+export const setPage = value => dispatch => {
+  dispatch({
+    type: "SET_PAGE",
+    payload: value
+  });
+};

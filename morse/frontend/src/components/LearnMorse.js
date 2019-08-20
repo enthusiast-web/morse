@@ -1,9 +1,21 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { resetLista } from "../actions/morseActions";
-import { defHigh, defLow, createCTX } from "../actions/morseActions";
+import {
+  defHigh,
+  defLow,
+  createCTX,
+  setContext,
+  setPage
+} from "../actions/morseActions";
 
 class LearnMorse extends Component {
+  constructor() {
+    super();
+    // criando a referencia pra adicionar e remover o eventelistener
+    this.upHandler = this.upHandler.bind(this);
+    this.pressHandler = this.pressHandler.bind(this);
+  }
   state = {
     learn: "",
     cm: [],
@@ -13,8 +25,9 @@ class LearnMorse extends Component {
     int: 0,
     set: "",
     key: "",
-    dificuldade: 10
+    dificuldade: 3
   };
+
   componentDidUpdate() {
     this.state.cm.map((obj, ind) => {
       this.state.lista.map(ls => {
@@ -44,80 +57,80 @@ class LearnMorse extends Component {
       }, 300);
     }
   }
+
   componentDidMount() {
     this.pickRandom();
-    document.addEventListener("keypress", e => {
-      this.setState({ key: e.key });
-      if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
-        if (!this.props.morse.oscillator) {
-          this.props.createCTX();
-        }
-
-        if (this.props.morse.start === 0) {
-          this.props.defHigh();
-          this.setState({ start: Date.now() });
-        }
+    window.addEventListener("keypress", this.pressHandler);
+    window.addEventListener("keyup", this.upHandler);
+  }
+  pressHandler = e => {
+    this.setState({ key: e.key });
+    if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
+      if (this.props.morse.start === 0) {
+        this.props.defHigh();
+        this.setState({ start: Date.now() });
       }
-      this.setState({ set: true });
-    });
-    document.addEventListener("keyup", e => {
-      console.log(
-        this.state.start - this.state.end,
+    }
+    // this.setState({ set: true });
+  };
+  upHandler = e => {
+    console.log(
+      this.state.start - this.state.end,
+      this.props.morse.speed * 3 -
+        this.props.morse.speed * this.state.dificuldade,
+      this.props.morse.speed * 3 +
+        this.props.morse.speed * this.state.dificuldade
+    );
+    if (
+      (this.state.start - this.state.end >
         this.props.morse.speed * 3 -
-          this.props.morse.speed * this.state.dificuldade,
-        this.props.morse.speed * 3 +
-          this.props.morse.speed * this.state.dificuldade
-      );
+          this.props.morse.speed * this.state.dificuldade &&
+        this.state.start - this.state.end <
+          this.props.morse.speed * 3 +
+            this.props.morse.speed * this.state.dificuldade) ||
+      this.state.start - this.state.end > 150000000 ||
+      this.state.start - this.state.end < -150000000 ||
+      this.state.lista.length === 0
+    ) {
       if (
-        (this.state.start - this.state.end >
+        e.key !== "Tab" &&
+        e.key !== "Alt" &&
+        !/^[0-9]$/i.test(e.key) &&
+        e.key === this.state.key
+      ) {
+        setTimeout(() => this.props.defLow(), 15);
+        this.setState({ end: Date.now() });
+      }
+      if (this.state.lista.length >= 4) {
+        this.setState({ lista: [] });
+      }
+
+      if (
+        this.state.end - this.state.start >
           this.props.morse.speed * 3 -
             this.props.morse.speed * this.state.dificuldade &&
-          this.state.start - this.state.end <
-            this.props.morse.speed * 3 +
-              this.props.morse.speed * this.state.dificuldade) ||
-        this.state.start - this.state.end > 150000000
-      ) {
-        if (
-          e.key !== "Tab" &&
-          e.key !== "Alt" &&
-          !/^[0-9]$/i.test(e.key) &&
-          e.key === this.state.key
-        ) {
-          setTimeout(() => this.props.defLow(), 30);
-          this.setState({ end: Date.now() });
-        }
-        if (this.state.lista.length >= 4) {
-          this.setState({ lista: [] });
-        }
-
-        if (
-          this.state.end - this.state.start >
-            this.props.morse.speed * 3 -
-              this.props.morse.speed * this.state.dificuldade &&
-          this.state.end - this.state.start <
-            this.props.morse.speed * 3 +
-              this.props.morse.speed * this.state.dificuldade
-        ) {
-          console.log("---------------");
-          this.setState({ lista: [...this.state.lista, "-"] });
-        } else if (
-          this.state.end - this.state.start <
-          this.props.morse.speed +
+        this.state.end - this.state.start <
+          this.props.morse.speed * 3 +
             this.props.morse.speed * this.state.dificuldade
-        ) {
-          console.log("......");
-          this.setState({ lista: [...this.state.lista, "."] });
-        }
-        this.setState({ set: false, int: 0 });
-      } else {
-        setTimeout(() => this.props.defLow(), 30);
-        this.setState({ lista: [] });
-        // this.pickRandom();
-        this.setState({ end: Date.now() });
-        this.setState({ end: 0 });
+      ) {
+        console.log("---------------");
+        this.setState({ lista: [...this.state.lista, "-"] });
+      } else if (
+        this.state.end - this.state.start <
+        this.props.morse.speed + this.props.morse.speed * this.state.dificuldade
+      ) {
+        console.log("......");
+        this.setState({ lista: [...this.state.lista, "."] });
       }
-    });
-  }
+      this.setState({ set: false, int: 0 });
+    } else {
+      setTimeout(() => this.props.defLow(), 15);
+      this.setState({ lista: [] });
+      // this.pickRandom();
+      this.setState({ end: Date.now() });
+      this.setState({ end: 0 });
+    }
+  };
 
   pickRandom = () => {
     var lett = "abcdefghijklmnopqrstuvwxyz";
@@ -134,14 +147,18 @@ class LearnMorse extends Component {
     console.log(e.target.name, e.target.value);
     this.setState({ [e.target.name]: e.target.value });
   };
+  componentWillUnmount() {
+    console.log("abc");
+    window.removeEventListener("keypress", this.pressHandler);
+    window.removeEventListener("keyup", this.upHandler);
+  }
   render() {
     return (
       <div>
-        <div>
+        <div className="input-group">
           <button onClick={() => this.pickRandom()}>aleatorio</button>
           <button onClick={() => this.setState({ lista: [] })}>reset</button>
           <select
-            // multiple={true}
             value={this.state.dificuldade}
             onChange={this.onChange}
             name="dificuldade"
@@ -158,10 +175,11 @@ class LearnMorse extends Component {
         <div style={{ width: "100% ", height: 25 }}>
           <div style={{ position: "relative", marginLeft: "10px" }}>
             <div style={{ display: "flex", position: "absolute", left: 10 }}>
-              {this.state.lista.map(obj => {
+              {this.state.lista.map((obj, ind) => {
                 if (obj === "-") {
                   return (
                     <div
+                      key={ind}
                       style={{
                         width: 100,
                         height: 25,
@@ -174,6 +192,7 @@ class LearnMorse extends Component {
                 } else {
                   return (
                     <div
+                      key={ind}
                       style={{
                         width: 25,
                         height: 25,
@@ -196,10 +215,11 @@ class LearnMorse extends Component {
               />
             </div>
             <div style={{ position: "absolute", left: 10, display: "flex" }}>
-              {this.state.cm.map(obj => {
+              {this.state.cm.map((obj, ind) => {
                 if (obj === "-") {
                   return (
                     <div
+                      key={ind}
                       style={{
                         width: 100,
                         height: 25,
@@ -213,6 +233,7 @@ class LearnMorse extends Component {
                 } else {
                   return (
                     <div
+                      key={ind}
                       style={{
                         width: 25,
                         height: 25,
@@ -240,5 +261,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { resetLista, defHigh, defLow, createCTX }
+  { resetLista, defHigh, defLow, createCTX, setContext, setPage }
 )(LearnMorse);

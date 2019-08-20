@@ -1,10 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { changeGain } from "../actions/morseActions";
+import { createCTX } from "../actions/morseActions";
 class Volume extends Component {
   onChange = e => {
     this.props.changeGain(e.target.value);
   };
+  componentDidMount() {
+    this.props.createCTX();
+  }
   render() {
     return (
       <div>
@@ -30,5 +34,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { changeGain }
+  { changeGain, createCTX }
 )(Volume);

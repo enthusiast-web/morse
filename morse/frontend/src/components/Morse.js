@@ -1,30 +1,47 @@
 import React, { Component } from "react";
 import Volume from "./Volume";
-import { defHigh, defLow, createCTX } from "../actions/morseActions";
+import {
+  defHigh,
+  defLow,
+  createCTX,
+  resetLista,
+  setContext,
+  setPage
+} from "../actions/morseActions";
 import { connect } from "react-redux";
 import Speed from "./Speed";
 class Morse extends Component {
+  constructor() {
+    super();
+    // criando a referencia pra adicionar e remover o eventelistener
+    this.upHandler = this.upHandler.bind(this);
+    this.pressHandler = this.pressHandler.bind(this);
+  }
   componentDidMount() {
-    console.log(this.props.morse);
+    window.addEventListener("keypress", this.pressHandler);
+    window.addEventListener("keyup", this.upHandler);
 
-    document.addEventListener("keypress", e => {
-      if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
-        // o audioCTX é criado somente se o no state do redux audio ctx for null (!audioCtx)
-        if (!this.props.morse.oscillator) {
-          this.props.createCTX();
-        }
-        // impede o evento de dar trigger em defHIgh se a tleca ja tiver sido apertada
-        // o evento defLow usa os dados do start e o define como 0 novamente
-        if (this.props.morse.start === 0) {
-          this.props.defHigh();
-        }
+    // this.props.resetLista();
+  }
+
+  upHandler = e => {
+    if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
+      setTimeout(() => this.props.defLow(), 50);
+    }
+  };
+  pressHandler = e => {
+    if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
+      // impede o evento de dar trigger em defHIgh se a tleca ja tiver sido apertada
+      // o evento defLow usa os dados do start e o define como 0 novamente
+      if (this.props.morse.start === 0) {
+        this.props.defHigh();
       }
-    });
-    document.addEventListener("keyup", e => {
-      if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
-        setTimeout(() => this.props.defLow(), 50);
-      }
-    });
+    }
+  };
+  componentWillUnmount() {
+    console.log("abc");
+    window.removeEventListener("keypress", this.pressHandler);
+    window.removeEventListener("keyup", this.upHandler);
   }
 
   render() {
@@ -62,5 +79,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { defHigh, defLow, createCTX }
+  { defHigh, defLow, createCTX, resetLista, setContext, setPage, resetLista }
 )(Morse);
