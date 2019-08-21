@@ -5,9 +5,6 @@ import Volume from "./Volume";
 import Morse from "./Morse";
 import LangToMorse from "./LangToMorse";
 import LearnMorse from "./LearnMorse";
-function traslate() {
-  return <h2>traslate</h2>;
-}
 
 export default function appRouter() {
   const style = {
@@ -74,7 +71,7 @@ export default function appRouter() {
           </div>
         </nav>
         <div className="container mx-auto">
-          <div className="col-sm">
+          <div className=" mt-2 pb-2 col-sm">
             <div className="col-sm">
               <div className="row">
                 <div className="col-sm">

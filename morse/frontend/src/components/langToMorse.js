@@ -6,7 +6,7 @@ import {
   defLow,
   createCTX
 } from "../actions/morseActions";
-
+import Icon from "@material-ui/core/Icon";
 class langToMorse extends Component {
   state = {
     texto: "",
@@ -14,39 +14,25 @@ class langToMorse extends Component {
     total: 0,
     lista_normal: [],
     morse: "",
-    morseTraduzido: []
+    morseTraduzido: [],
+    display: true
   };
-  // componentDidMount() {
-  //   this.dot = this.dot.bind(this);
-  //   window.addEventListener("keypress", this.dot);
-  // }
-  // componentWillUnmount() {
-  //   window.removeEventListener("keypress", this.dot);
-  // }
-  // dot = e => {
-  //   console.log(this.state.morse);
-  //   if (e.key === ".") {
-  //     this.setState({ morse: this.state.morse.concat(".") });
-  //   }
-  //   if (e.key === " ") {
-  //     this.setState({ morse: this.state.morse.concat(" ") });
-  //   }
-  //   if (e.key === "-") {
-  //     this.setState({ morse: this.state.morse.concat("-") });
-  //   }
-  //   var ms = this.state.morse.split(" ");
-  //   this.setState({ morseTraduzido: "" }, () =>
-  //     ms.map(obj => {
-  //       for (var i in this.props.morse.letras) {
-  //         if (obj === this.props.morse.letras[i]) {
-  //           this.setState({
-  //             morseTraduzido: this.state.morseTraduzido.concat(i)
-  //           });
-  //         }
-  //       }
-  //     })
-  //   );
-  // };
+
+  componentDidMount() {
+    this.display = this.display.bind(this);
+    this.update = this.update.bind(this);
+    window.addEventListener("resize", this.display);
+    window.addEventListener("resize", this.update);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.display);
+    window.removeEventListener("resize", this.update);
+    
+  }
+  // isso funciona para força o rerender :( 
+  update = () => {
+    this.setState({ state: this.state });
+  };
   onChange = e => {
     this.setState({ [e.target.name]: e.target.value });
     this.morseTolang();
@@ -71,18 +57,19 @@ class langToMorse extends Component {
     // console.log(lista_normal);
     return [lista_normal, lista];
   };
+
   morseTolang = () => {
     var ms = this.state.morse.split(" ");
     var toReturn = [];
-    console.log(ms);
-    console.log(this.state.morse);
+
     ms.map(obj => {
       for (var i in this.props.morse.letras) {
         if (obj === this.props.morse.letras[i]) {
-          toReturn.push(i);
+          toReturn.push([i, obj]);
         } else {
           if (obj === "") {
-            toReturn.push(" ");
+            toReturn.push([" ", ""]);
+            break;
           }
         }
       }
@@ -90,14 +77,20 @@ class langToMorse extends Component {
 
     return toReturn;
   };
+  //o arg serve pra decidir se vai dar play
+  // na traduçao ou no codigo morse direto
 
-  play = () => {
-    var lista = this.ChangeLista()[0];
+  play = arg => {
+    if (arg) {
+      var lista = this.state.morse.split("");
+      lista = lista.join(",");
+    } else {
+      var lista = this.ChangeLista()[0];
+      lista = lista.map(obj => obj.split(""));
+      lista = lista.join(",");
+    }
 
-    lista = lista.map(obj => obj.split(""));
-    lista = lista.join(",");
     var total = 0;
-    console.log(this.props.morse.end, Date.now());
 
     if (this.state.total === 0) {
       // this.props.createCTX();
@@ -145,12 +138,44 @@ class langToMorse extends Component {
     }
     return color;
   };
+  // mostra os dois inputs se for na tela grande
+  // caso contrario mostra o botao de switch
+  // functional style
+  display = () => {
+    if (window.innerWidth < 999) {
+      if (this.state.display) {
+        return ["none", "block", "linguagem", "morse"];
+      } else {
+        return ["block", "none", "morse", "linguagem "];
+      }
+    } else return ["block", "block", "", ""];
+  };
   render() {
     return (
-      <div className="container mx-auto">
+      <div className="container m-0">
         <div className="row">
-          <div className="col-sm" style={{ width: 300, height: 100 }}>
+          <div className="d-xl-none d-lg-none container   m-0 p-0">
+            <div className="row  no-gutters">
+              <div className="col-sm">{this.display()[2]}</div>
+
+              <Icon
+                className="col-sm"
+                fontSize="large"
+                onClick={() => {
+                  this.setState({ display: !this.state.display });
+                }}
+              >
+                compare_arrows
+              </Icon>
+              <div className="col-sm">{this.display()[3]}</div>
+            </div>
+          </div>
+          <div
+            className="col-sm m-0 p-0"
+            style={{ maxWidth: 500, height: 100, display: this.display()[1] }}
+          >
             <input
+              className="col-sm"
               onChange={this.onChange}
               name="texto"
               value={this.state.texto}
@@ -159,30 +184,74 @@ class langToMorse extends Component {
               type="text"
             />
             <div>
-              <button onClick={() => this.play()}> play</button>
+              <Icon fontSize="large" onClick={() => this.play()}>
+                play_arrow
+              </Icon>
             </div>
-            <div className="d-flex">
-              {this.ChangeLista()[1].map((obj, ind) => (
-                <div
-                  key={ind}
-                  style={{
-                    margin: "0px 0px 0px 10px",
-                    fontSize: "25px",
-                    color: this.getColor(ind)
-                  }}
-                >
-                  <p style={{ textAlign: "center", marginBottom: 0 }}>
-                    {obj[1]}
-                  </p>
-                  <p style={{ textAlign: "center", marginBottom: 0 }}>
-                    {obj[0]}
-                  </p>
-                </div>
-              ))}
+            <div
+              className="container"
+              style={{
+                maxWidth: 500,
+                // border: "1px solid black",
+                height: "auto",
+                padding: 0,
+                margin: 0
+              }}
+            >
+              <div className="row no-gutters ">
+                {this.ChangeLista()[1].map((obj, ind) => {
+                  if (obj !== "") {
+                    return (
+                      <div
+                        className="col-1"
+                        key={ind}
+                        style={{
+                          height: "auto",
+                          margin: "0px 0px 0px 5px",
+                          fontSize: "20px",
+                          color: this.getColor(ind),
+                          paddingRight: 10,
+                          margin: 0,
+                          borderBottom: "1px solid black"
+                        }}
+                      >
+                        <p
+                          style={{
+                            whiteSpace: "normal",
+                            width: 40,
+                            textAlign: "center",
+                            marginBottom: 0,
+                            padding: 0,
+                            margin: 0
+                          }}
+                        >
+                          {obj[1]}
+                        </p>
+                        <p
+                          style={{
+                            whiteSpace: "normal",
+                            width: 40,
+                            textAlign: "center",
+                            marginBottom: 0,
+                            padding: 0,
+                            margin: 0
+                          }}
+                        >
+                          {obj[0]}
+                        </p>
+                      </div>
+                    );
+                  }
+                })}
+              </div>
             </div>
           </div>
-          <div className="col-sm" style={{ width: 300, height: 100 }}>
+          <div
+            className="col-sm  m-0 p-0"
+            style={{ maxWidth: 500, height: 100, display: this.display()[0] }}
+          >
             <input
+              className="col-sm"
               onChange={this.onChange}
               name="morse"
               value={this.state.morse}
@@ -190,7 +259,58 @@ class langToMorse extends Component {
               placeholder="digite aqui em codigo morse ,ex: ..- ..-"
               type="text"
             />
-            <p style={{ fontSize: 25 }}>{this.morseTolang().map(obj => obj)}</p>
+            <div className="m-0 p-0">
+              <Icon fontSize="large" onClick={() => this.play("arg")}>
+                play_arrow
+              </Icon>
+            </div>
+            <div className="container m-0 p-0" style={{ maxWidth: 500 }}>
+              <div className="row no-gutters ">
+                {this.morseTolang().map((obj, ind) => {
+                  if (obj[1] !== "") {
+                    return (
+                      <div
+                        key={ind}
+                        style={{
+                          margin: "0px 0px 0px 10px",
+                          fontSize: "20px",
+                          color: this.getColor(ind),
+                          borderBottom: "1px solid black",
+                          marginBottom: 0,
+                          paddingRight: 10,
+                          margin: 0
+                        }}
+                      >
+                        <p
+                          style={{
+                            whiteSpace: "normal",
+                            width: 40,
+                            textAlign: "center",
+                            marginBottom: 0,
+                            padding: 0,
+                            margin: 0
+                          }}
+                        >
+                          {obj[1]}
+                        </p>
+                        <p
+                          style={{
+                            whiteSpace: "normal",
+                            width: 40,
+                            textAlign: "center",
+                            marginBottom: 0,
+                            padding: 0,
+                            margin: 0
+                          }}
+                        >
+                          {obj[0]}
+                        </p>
+                      </div>
+                    );
+                  }
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>

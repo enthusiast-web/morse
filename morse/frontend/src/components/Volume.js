@@ -16,12 +16,14 @@ class Volume extends Component {
           <label> volume: {(this.props.morse.volume * 100).toFixed(0)} %</label>
         </div>
         <input
+          className="custom-range"
           onChange={this.onChange}
           type="range"
           min="0"
           max="1"
           step="0.001"
           value={this.props.morse.volume}
+          style={{ maxWidth: "150px", color: "green" }}
         />
       </div>
     );

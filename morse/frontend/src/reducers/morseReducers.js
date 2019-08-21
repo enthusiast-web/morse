@@ -95,7 +95,7 @@ export default function(state = initialState, action, dispatch) {
       var oscillator = audioCtx.createOscillator();
 
       oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime); // value in hertz
+      oscillator.frequency.setValueAtTime(820, audioCtx.currentTime); // value in hertz
       oscillator.start();
 
       return { ...state, oscillator: oscillator, gain: gain };
@@ -103,9 +103,14 @@ export default function(state = initialState, action, dispatch) {
     case "DEF_HIGH":
       var oscillator = state.oscillator;
       state.gain.gain.value = state.volume;
+      state.gain.gain.setValueAtTime(0, state.audioCtx.currentTime);
+      state.gain.gain.linearRampToValueAtTime(
+        1.0,
+        state.audioCtx.currentTime + 0.01
+      );
 
       oscillator.connect(state.gain);
-      // oscillator.detune.setValueAtTime(0, state.audioCtx.currentTime);
+
       // vendo o espaçamento
       var space = "";
       var start = Date.now();
@@ -125,8 +130,16 @@ export default function(state = initialState, action, dispatch) {
       var oscillator = state.oscillator;
       state.gain.gain.value = state.volume;
 
-      oscillator.disconnect(state.gain);
-      // oscillator.detune.setValueAtTime(0, state.audioCtx.currentTime);
+      state.gain.gain.linearRampToValueAtTime(
+        0,
+        state.audioCtx.currentTime + 0.01
+      );
+      // ?????????????????????
+      // aparentemente nao precisa disconectar o oscilato do state.gain
+      // setTimeout(() => {
+      //   oscillator.disconnect(state.gain);
+      // }, 0.02);
+
       var end = Date.now();
       // antigo "DEF_SIZE"
       // define se é . ou -  e coloca os espaços de palavra ,letra e entre .e _ das letras
