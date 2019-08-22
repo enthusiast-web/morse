@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'morse.api.apps.ApiConfig',
-    'morse.frontend.apps.FrontendConfig',
+    'api.apps.ApiConfig',
+    'frontend.apps.FrontendConfig',
    
 ]
 
