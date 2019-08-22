@@ -71,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'morse.morse.wsgi.application'
+WSGI_APPLICATION = 'morse.wsgi.application'
 
 
 # Database
