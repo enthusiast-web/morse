@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "webpack --mode development --watch ./frontend/src/index.js --output ./frontend/static/main.js",
+    "dev": "webpack --mode development --watch ./frontend/src/index.js --output ./frontend/static/main.js"
     
   },
   "author": "",
