@@ -26,6 +26,7 @@ class Morse extends Component {
 
   upHandler = e => {
     if (e) {
+      e.preventDefault();
       console.log(e.key);
       if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
         setTimeout(() => this.props.defLow(), 50);
@@ -37,6 +38,7 @@ class Morse extends Component {
   };
   pressHandler = e => {
     if (e) {
+      e.preventDefault();
       console.log(e.key);
       if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
         // impede o evento de dar trigger em defHIgh se a tleca ja tiver sido apertada
