@@ -27,19 +27,18 @@ class Morse extends Component {
   upHandler = e => {
     if (e) {
       e.preventDefault();
-      console.log(e.key);
+      console.log(e);
       if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
         setTimeout(() => this.props.defLow(), 50);
       }
     } else {
-      console.log("idk");
-      setTimeout(() => this.props.defLow(), 50);
+      setTimeout(() => this.props.defLow(), 10);
     }
   };
   pressHandler = e => {
     if (e) {
       e.preventDefault();
-      console.log(e.key);
+      console.log(e);
       if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
         // impede o evento de dar trigger em defHIgh se a tleca ja tiver sido apertada
         // o evento defLow usa os dados do start e o define como 0 novamente
@@ -48,12 +47,10 @@ class Morse extends Component {
         }
       }
     } else {
-      console.log("idk");
       this.props.defHigh();
     }
   };
   componentWillUnmount() {
-    console.log("abc");
     window.removeEventListener("keypress", this.pressHandler);
     window.removeEventListener("keyup", this.upHandler);
   }
@@ -66,8 +63,8 @@ class Morse extends Component {
         </div>
 
         <div
-          onTouchEnd={() => this.upHandler()}
-          onTouchStart={() => this.pressHandler()}
+          onTouchEnd={e => this.upHandler(e)}
+          onTouchStart={e => this.pressHandler(e)}
           onMouseUp={e => this.upHandler(e)}
           onMouseDown={e => this.pressHandler(e)}
           style={{ width: "100%", minHeight: 300, border: "1px solid black" }}
