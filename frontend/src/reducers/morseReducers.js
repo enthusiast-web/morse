@@ -60,7 +60,8 @@ const initialState = {
   //  e o feedback ao vivo tbm
   control: [],
   trans_control: "",
-  gain: ""
+  gain: "",
+  started: false
 };
 
 // IMPORTANTE : espaço entre letras=450 ,entre palavras =1050,tempo do ponto =150 da barra 300
@@ -102,7 +103,12 @@ export default function(state = initialState, action, dispatch) {
     //conecta o oscilator ao audixo.ctx.destination
     case "DEF_HIGH":
       var oscillator = state.oscillator;
-      oscillator.start();
+
+      if (!state.started) {
+        console.log(oscillator);
+        oscillator.start();
+      }
+
       state.gain.gain.value = state.volume;
       state.gain.gain.setValueAtTime(0, state.audioCtx.currentTime);
       state.gain.gain.linearRampToValueAtTime(
@@ -124,7 +130,13 @@ export default function(state = initialState, action, dispatch) {
         }
       }
 
-      return { ...state, oscillator: oscillator, start: start, space: space };
+      return {
+        ...state,
+        oscillator: oscillator,
+        start: start,
+        space: space,
+        started: true
+      };
 
     //desconecta o oscilator ao audixo.ctx.destination
     case "DEF_LOW":
