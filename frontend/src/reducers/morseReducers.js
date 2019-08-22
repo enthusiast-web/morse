@@ -96,7 +96,7 @@ export default function(state = initialState, action, dispatch) {
 
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(820, audioCtx.currentTime); // value in hertz
-      oscillator.start();
+      // oscillator.start();
 
       return { ...state, oscillator: oscillator, gain: gain };
     //conecta o oscilator ao audixo.ctx.destination
