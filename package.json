@@ -9,7 +9,7 @@
   },
   "scripts": {
     
-    "start": "webpack --mode production ./frontend/src/index.js --output ./frontend/static/main.js",
+    "start": "node ./morse//frontend/src/index.js",
 
     "dev": "webpack --mode development --watch ./frontend/src/index.js --output ./frontend/static/main.js"
     
