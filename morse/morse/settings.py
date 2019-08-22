@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'morse.api',
-    'morse.frontend'
+    'morse.morse.api',
+    'morse.morse.frontend'
    
 ]
 REACT_APP_DIR = os.path.join(BASE_DIR, 'frontend')
