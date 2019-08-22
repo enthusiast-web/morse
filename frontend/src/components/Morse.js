@@ -25,17 +25,29 @@ class Morse extends Component {
   }
 
   upHandler = e => {
-    if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
+    if (e) {
+      console.log(e.key);
+      if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
+        setTimeout(() => this.props.defLow(), 50);
+      }
+    } else {
+      console.log("idk");
       setTimeout(() => this.props.defLow(), 50);
     }
   };
   pressHandler = e => {
-    if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
-      // impede o evento de dar trigger em defHIgh se a tleca ja tiver sido apertada
-      // o evento defLow usa os dados do start e o define como 0 novamente
-      if (this.props.morse.start === 0) {
-        this.props.defHigh();
+    if (e) {
+      console.log(e.key);
+      if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
+        // impede o evento de dar trigger em defHIgh se a tleca ja tiver sido apertada
+        // o evento defLow usa os dados do start e o define como 0 novamente
+        if (this.props.morse.start === 0) {
+          this.props.defHigh();
+        }
       }
+    } else {
+      console.log("idk");
+      this.props.defHigh();
     }
   };
   componentWillUnmount() {
@@ -47,15 +59,17 @@ class Morse extends Component {
   render() {
     return (
       <div>
-        <div
-          style={{ width: "100%", fontSize: "35px" }}
-          onClick={() => {
-            this.props.createCTX();
-          }}
-        >
-          realize o codigo morse com a barra de espaço
+        <div style={{ width: "100%", fontSize: "20px" }}>
+          clique na tecla ou aperte qualquer tecla
         </div>
-        <div style={{ width: "100%", minHeight: 300 }}>
+
+        <div
+          onTouchEnd={() => this.upHandler()}
+          onTouchStart={() => this.pressHandler()}
+          onMouseUp={e => this.upHandler(e)}
+          onMouseDown={e => this.pressHandler(e)}
+          style={{ width: "100%", minHeight: 300, border: "1px solid black" }}
+        >
           <div>
             <p style={{ fontSize: 55 }}>{this.props.morse.lista}</p>
           </div>
@@ -66,8 +80,6 @@ class Morse extends Component {
             </p>
           </div>
         </div>
-        {/* <Volume />
-        <Speed /> */}
       </div>
     );
   }
