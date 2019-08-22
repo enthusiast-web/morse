@@ -1,1 +1,1 @@
-web: gunicorn mors.wsgi 
+web: gunicorn morse.wsgi 
