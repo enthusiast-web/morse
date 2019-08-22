@@ -101,6 +101,7 @@ export default function(state = initialState, action, dispatch) {
       return { ...state, oscillator: oscillator, gain: gain };
     //conecta o oscilator ao audixo.ctx.destination
     case "DEF_HIGH":
+      oscillator.start();
       var oscillator = state.oscillator;
       state.gain.gain.value = state.volume;
       state.gain.gain.setValueAtTime(0, state.audioCtx.currentTime);
