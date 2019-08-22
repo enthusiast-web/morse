@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    # 'api',
-    'frontend'
+    'morse.apps.ApiConfig',
+    'morse.apps.FrontendConfig',
+   
 ]
 
 MIDDLEWARE = [
