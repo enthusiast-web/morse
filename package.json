@@ -8,7 +8,7 @@
   },
   "scripts": {
     
-    "start": "node ./frontend/src/index.js ",
+    "start": "webpack --mode production ./frontend/src/index.js --output ./frontend/static/main.js",
 
     "dev": "webpack --mode development --watch ./frontend/src/index.js --output ./frontend/static/main.js"
     
