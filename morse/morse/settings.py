@@ -25,7 +25,7 @@ SECRET_KEY = 'w09@n-1)q+!c%e)vq8$v=b4qs9vm^kscsms@nc*)q4o&&uk!--'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['react-django.herokuapp.com', '127.0.0.1:8000']
 
 
 # Application definition
@@ -54,7 +54,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'morse.urls'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
