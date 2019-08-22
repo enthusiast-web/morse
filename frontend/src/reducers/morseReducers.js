@@ -112,7 +112,7 @@ export default function(state = initialState, action, dispatch) {
       state.gain.gain.value = state.volume;
       state.gain.gain.setValueAtTime(0, state.audioCtx.currentTime);
       state.gain.gain.linearRampToValueAtTime(
-        1.0,
+        state.volume,
         state.audioCtx.currentTime + 0.01
       );
 
