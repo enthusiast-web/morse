@@ -1,6 +1,7 @@
 {
     "python.pythonPath": "C:\\Users\\samuel\\.virtualenvs\\morse-9SpocXiI\\Scripts\\python.exe",
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": true,
+    
 // Enable per-language
 "[javascript]": {
     "editor.formatOnSave": true}
