@@ -18,7 +18,8 @@ class Morse extends Component {
     this.pressHandler = this.pressHandler.bind(this);
   }
   state = {
-    iniciado: false
+    iniciado: false,
+    displayMorse:true
   };
   componentDidMount() {
     var element = document.getElementById("click");
@@ -77,28 +78,58 @@ class Morse extends Component {
     }
     return "block";
   };
+  morseDisplay=()=>{
+    if (this.state.displayMorse) {
+      return "none";
+    }
+    return "block";
+  }
+  onChange=()=>{
+
+  }
   render() {
     return (
       <div>
         <div style={{ width: "100%", fontSize: "20px" }}>
           clique na caixa ou aperte qualquer tecla para começar
         </div>
+        <div>
+              <p style={{ fontSize: 55 }}>{this.props.morse.lista}</p>
+            </div>
+        <div className="d-flex">
+              
+              <input
+                style={{ marginTop: "auto", marginBottom: "auto" }}
+                type="checkbox"
+                value={this.state.displayMorse}
+                onChange={() =>
+                  this.setState({
+                    displayMorse:!this.state.displayMorse
+                  })
+                }
+              />
+              <label style={{ marginTop: "auto", marginBottom: "auto" }}>
+                morstrar tradução
+              </label>
+            </div>
+            
         <div style={{ width: "100%", minHeight: 300, border: "1px solid black",position:'relative' }}>
+       
           <div
           style={{ width: "100%", height:"100%",
         minHeight: 300,position:"absolute",top:0}}
             id="click"
           >
+            
+            
             <div>
-              <p style={{ fontSize: 55 }}>{this.props.morse.lista}</p>
-            </div>
-            <div>
-              <p style={{ fontSize: 55 }}>
+              <p style={{ fontSize: 55 ,display:this.morseDisplay()}}>
                 {this.props.morse.translate}
                 {this.props.morse.trans_control}
               </p>
             </div>
           </div>
+         
           <div
             onClick={() => {
               this.setState({ iniciado: true });

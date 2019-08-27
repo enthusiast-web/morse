@@ -45,13 +45,16 @@ class langToMorse extends Component {
   ChangeLista = () => {
     var lista = [];
     var lista_normal = [];
+    console.log("A".toLocaleLowerCase());
     [...this.state.texto].map((obj, ind) => {
       if (obj === " " && this.state.texto[ind + 1] !== " ") {
         lista_normal = [...lista_normal, " / "];
         lista = [...lista, [" "]];
       }
       for (var i in this.props.morse.letras) {
-        if (obj === i) {
+        // console.log(obj.toLocaleLowerCase())
+        if (obj === i || obj=== i.toUpperCase()) {
+          
           lista_normal = [...lista_normal, " ", this.props.morse.letras[i]];
           lista = [...lista, [" " + this.props.morse.letras[i], " " + i]];
         }
@@ -67,7 +70,7 @@ class langToMorse extends Component {
 
     ms.map((obj, ind) => {
       for (var i in this.props.morse.letras) {
-        if (obj === this.props.morse.letras[i]) {
+        if (obj === this.props.morse.letras[i] || obj.toLowerCase=== this.props.morse.letras[i]) {
           toReturn.push([i, obj]);
         } else {
           if (obj === "" || (obj.includes("/") && ms[ind + 1] !== "")) {
