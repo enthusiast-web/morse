@@ -9,7 +9,7 @@ import {
   setPage
 } from "../actions/morseActions";
 import { connect } from "react-redux";
-import Speed from "./Speed";
+
 class Morse extends Component {
   constructor() {
     super();
@@ -19,7 +19,7 @@ class Morse extends Component {
   }
   state = {
     iniciado: false,
-    displayMorse:true
+    displayMorse: true
   };
   componentDidMount() {
     var element = document.getElementById("click");
@@ -30,11 +30,11 @@ class Morse extends Component {
     window.addEventListener("keypress", this.pressHandler);
     window.addEventListener("keyup", this.upHandler);
 
-    // this.props.resetLista();
+    this.props.resetLista();
   }
 
   upHandler = e => {
-     this.setState({ iniciado: true });
+    this.setState({ iniciado: true });
     if (e) {
       e.preventDefault();
       console.log(e);
@@ -46,7 +46,7 @@ class Morse extends Component {
     }
   };
   pressHandler = e => {
-     this.setState({ iniciado: true });
+    this.setState({ iniciado: true });
     if (e) {
       e.preventDefault();
       console.log(e.key);
@@ -78,75 +78,93 @@ class Morse extends Component {
     }
     return "block";
   };
-  morseDisplay=()=>{
+  morseDisplay = () => {
     if (this.state.displayMorse) {
       return "none";
     }
     return "block";
-  }
-  onChange=()=>{
-
-  }
+  };
+  onChange = () => {};
   render() {
     return (
       <div>
         <div style={{ width: "100%", fontSize: "20px" }}>
           clique na caixa ou aperte qualquer tecla para começar
         </div>
-        <div>
-              <p style={{ fontSize: 55 }}>{this.props.morse.lista}</p>
-            </div>
+
         <div className="d-flex">
-              
-              <input
-                style={{ marginTop: "auto", marginBottom: "auto" }}
-                type="checkbox"
-                value={this.state.displayMorse}
-                onChange={() =>
-                  this.setState({
-                    displayMorse:!this.state.displayMorse
-                  })
-                }
-              />
-              <label style={{ marginTop: "auto", marginBottom: "auto" }}>
-                morstrar tradução
-              </label>
-            </div>
-            
-        <div style={{ width: "100%", minHeight: 300, border: "1px solid black",position:'relative' }}>
-       
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => this.props.resetLista()}
+          >
+            {" "}
+            limpar tudo{" "}
+          </button>
+          <input
+            style={{ marginTop: "auto", marginBottom: "auto" }}
+            type="checkbox"
+            value={this.state.displayMorse}
+            onChange={() =>
+              this.setState({
+                displayMorse: !this.state.displayMorse
+              })
+            }
+          />
+          <label style={{ marginTop: "auto", marginBottom: "auto" }}>
+            morstrar tradução
+          </label>
+        </div>
+
+        <div
+          style={{
+            width: "100%",
+            minHeight: 200,
+            height: "50%",
+            border: "1px solid black",
+            position: "relative"
+          }}
+        >
           <div
-          style={{ width: "100%", height:"100%",
-        minHeight: 300,position:"absolute",top:0}}
+            style={{
+              width: "100%",
+              minHeight: 200,
+              height: "50%",
+
+              position: "absolute",
+              top: 0
+            }}
             id="click"
           >
-            
-            
             <div>
-              <p style={{ fontSize: 55 ,display:this.morseDisplay()}}>
+              <p style={{ fontSize: 55, display: this.morseDisplay() }}>
                 {this.props.morse.translate}
                 {this.props.morse.trans_control}
               </p>
             </div>
           </div>
-         
+
           <div
             onClick={() => {
               this.setState({ iniciado: true });
             }}
             style={{
               width: "100%",
-              height: "100%",
-              minHeight: 300,
-              position:"absolute",
-            
-              top:0,
-              background: "gray",
+              minHeight: 200,
+              height: "50%",
+
+              position: "absolute",
+
+              top: 0,
+              background: "#e3e1e1",
               opacity: 1,
-              display: this.coverDisplay(),
-             
+              display: this.coverDisplay()
             }}
           ></div>
+        </div>
+        <div>
+          <p style={{ fontSize: 55, overflowX: "scroll" }}>
+            {this.props.morse.lista}
+          </p>
         </div>
       </div>
     );
@@ -159,5 +177,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { defHigh, defLow, createCTX, resetLista, setContext, setPage, resetLista }
+  { defHigh, defLow, createCTX, resetLista, setContext, setPage }
 )(Morse);

@@ -8,8 +8,9 @@ import {
   setContext,
   setPage
 } from "../actions/morseActions";
-
+import Popup from "reactjs-popup";
 import Icon from "@material-ui/core/Icon";
+
 class LearnMorse extends Component {
   constructor() {
     super();
@@ -25,17 +26,18 @@ class LearnMorse extends Component {
     end: 0,
     total: 0,
     key: "",
-    dificuldade: 2
+    dificuldade: 2,
+    tempo: false,
+    iniciado: false
   };
 
   componentDidUpdate(prevP, prevS) {
-    
     this.state.cm.map((obj, ind) => {
       this.state.lista.map(ls => {
         if (this.state.lista[ind]) {
           if (
             this.state.lista[ind] !== this.state.cm[ind] ||
-            this.state.start - this.state.end > 1400
+            (this.state.start - this.state.end > 1400 && this.state.tempo)
           ) {
             setTimeout(() => {
               this.setState({ lista: [] });
@@ -51,12 +53,7 @@ class LearnMorse extends Component {
       this.state.cm.join(",") === this.state.lista.join(",") &&
       this.state.lista.join(",").length > 0
     ) {
-      console.log(
-        prevS.lista.join(","),
-
-        this.state.lista.join(",")
-      );
-      // this.setState({ lista: [] });
+      console.log("rese");
       setTimeout(() => {
         this.pickRandom(), this.setState({ lista: [] });
         this.setState({ end: 0 });
@@ -64,7 +61,6 @@ class LearnMorse extends Component {
       return;
     } else if (this.state.lista.length === 5) {
       setTimeout(() => {
-        console.log(222);
         this.pickRandom(), this.setState({ lista: [] });
       }, 600);
       return;
@@ -73,93 +69,99 @@ class LearnMorse extends Component {
 
   componentDidMount() {
     // this.pickRandom();
-    var element = document.getElementById("click")
+    var element = document.getElementById("click");
     window.addEventListener("keypress", this.pressHandler);
     window.addEventListener("keyup", this.upHandler);
-    element.addEventListener("mouseup",this.upHandler)
-    element.addEventListener('mousedown',this.pressHandler)
-    element.addEventListener("touchend",this.upHandler)
-    element.addEventListener('touchstart',this.pressHandler)
+    element.addEventListener("mouseup", this.upHandler);
+    element.addEventListener("mousedown", this.pressHandler);
+    element.addEventListener("touchend", this.upHandler);
+    element.addEventListener("touchstart", this.pressHandler);
   }
   pressHandler = e => {
-    
     this.setState({ key: e.key });
-    if(e){
-      e.preventDefault();
-    if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
-      if (this.props.morse.start === 0) {
-        this.props.defHigh();
-        this.setState({ start: Date.now() });
+    if (e) {
+      if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
+        e.preventDefault();
+        if (this.props.morse.start === 0) {
+          this.props.defHigh();
+          this.setState({ start: Date.now() });
+        }
       }
+    } else {
+      this.props.defHigh();
+      this.setState({ start: Date.now() });
     }
-  }else{
-    this.props.defHigh();
-    this.setState({ start: Date.now() });
-  }
   };
+  // se o marcado de tempo for true , o uphandler olha o  tmepo entre letra
+  // caso contrario sempre marca o - ou.
   upHandler = e => {
     if (
-      (this.state.start - this.state.end >
-        this.props.morse.speed * 3 -
-          this.props.morse.speed * this.state.dificuldade &&
+      (this.state.tempo &&
+        this.state.start - this.state.end >
+          this.props.morse.speed * 3 -
+            this.props.morse.speed * this.state.dificuldade &&
         this.state.start - this.state.end <
           this.props.morse.speed * 3 +
             this.props.morse.speed * this.state.dificuldade) ||
       this.state.start - this.state.end > 150000000 ||
       this.state.start - this.state.end < -150000000 ||
-      this.state.lista.length === 0
+      this.state.lista.length === 0 ||
+      !this.state.tempo
     ) {
-      if(e){
+      if (e) {
         e.preventDefault();
-      if (
-  
-        e.key !== "Tab" &&
-        e.key !== "Alt" &&
-        !/^[0-9]$/i.test(e.key) &&
-        e.key === this.state.key
-      ) {
+        if (
+          e.key !== "Tab" &&
+          e.key !== "Alt" &&
+          !/^[0-9]$/i.test(e.key) &&
+          e.key === this.state.key
+        ) {
+          setTimeout(() => this.props.defLow(), 15);
+          this.setState({ end: Date.now() });
+        }
+      } else {
         setTimeout(() => this.props.defLow(), 15);
         this.setState({ end: Date.now() });
       }
-    }
-    else{
-      setTimeout(() => this.props.defLow(), 15);
-        this.setState({ end: Date.now() });
-    }
       if (this.state.lista.length >= 4) {
         this.setState({ lista: [] });
       }
 
       if (
-        this.state.end - this.state.start >
+        (this.state.end - this.state.start >
           this.props.morse.speed * 3 -
             this.props.morse.speed * this.state.dificuldade &&
-        this.state.end - this.state.start <
-          this.props.morse.speed * 3 +
-            this.props.morse.speed * this.state.dificuldade
+          this.state.end - this.state.start <
+            this.props.morse.speed * 3 +
+              this.props.morse.speed * this.state.dificuldade) ||
+        //se o !this.state.tempo se for maior que 3x difuculdade
+        //sempre -
+        (!this.state.tempo &&
+          this.state.end - this.state.start >
+            this.props.morse.speed * 3 -
+              this.props.morse.speed * this.state.dificuldade)
       ) {
-        // console.log("---------------");
         this.setState({ lista: [...this.state.lista, "-"] });
       } else if (
         this.state.end - this.state.start <
-        this.props.morse.speed + this.props.morse.speed * this.state.dificuldade
+          this.props.morse.speed +
+            this.props.morse.speed * this.state.dificuldade ||
+        !this.state.tempo
       ) {
-        // console.log("......");
         this.setState({ lista: [...this.state.lista, "."] });
       }
       this.setState({ set: false, int: 0 });
     } else {
       setTimeout(() => this.props.defLow(), 15);
       this.setState({ lista: [] });
-      // this.pickRandom();
+
       this.setState({ end: Date.now() });
       this.setState({ end: 0 });
     }
   };
   play = () => {
-   
     var total = 0;
-    console.log(this.state.cm);
+
     if (this.state.total === 0) {
       // this.props.createCTX();
 
@@ -220,14 +222,19 @@ class LearnMorse extends Component {
     // console.log("abc");
     window.removeEventListener("keypress", this.pressHandler);
     window.removeEventListener("keyup", this.upHandler);
-    var element = document.getElementById("click")
-  
-    element.removeEventListener("mouseup",this.upHandler)
-    element.removeEventListener('mousedown',this.pressHandler)
-    element.removeEventListener("touchend",this.upHandler)
-    element.removeEventListener('touchstart',this.pressHandler)
-  }
+    var element = document.getElementById("click");
 
+    element.removeEventListener("mouseup", this.upHandler);
+    element.removeEventListener("mousedown", this.pressHandler);
+    element.removeEventListener("touchend", this.upHandler);
+    element.removeEventListener("touchstart", this.pressHandler);
+  }
+  coverDisplay = () => {
+    if (this.state.iniciado) {
+      return "none";
+    }
+    return "block";
+  };
   render() {
     return (
       <div>
@@ -236,22 +243,51 @@ class LearnMorse extends Component {
             className="btn btn-outline-secondary btn-sm"
             onClick={() => this.pickRandom()}
           >
-            começar
+            random
           </button>
+
           <button
             className="btn btn-outline-secondary btn-sm"
-            onClick={() => this.setState({ lista: [] })}
-          >
-            reset
-          </button>
-          <button
-            className="btn btn-outline-secondary btn-sm"
-            onClick={() => {this.play()}}
+            onClick={() => {
+              this.play();
+            }}
           >
             play
           </button>
-
-         
+          <Popup
+            modal
+            contentStyle={{ maxWidth: 320, width: "30%" }}
+            trigger={
+              <button className="btn btn-outline-secondary btn-sm">
+                ajuda
+              </button>
+            }
+          >
+            <div
+              style={{
+                minWidth: 300,
+                minHeight: 100,
+                textAlign: "center",
+                margin: "auto"
+              }}
+            >
+              <h3> ajuda</h3>
+              <p>
+                click na caixa ou aperte qualquer tecla no tempo correto para
+                realizar o codigo morse, apertar por mais tempo resulta em um
+                traço e em menos tempo resulta em um ponto
+              </p>
+              <p>
+                Os traços e pontos embaixo da letra representam essa letra em
+                codigo morse
+              </p>
+              <p>
+                {" "}
+                replique o som que foi reproduzido para aprender as letras do
+                morse
+              </p>
+            </div>
+          </Popup>
         </div>
 
         <p style={{ marginLeft: 10, fontSize: 50 }}>{this.state.learn}</p>
@@ -327,19 +363,44 @@ class LearnMorse extends Component {
                 }
               })}
             </div>
+            <div
+              id="click"
+              className="container mt-5 ml-0"
+              style={{
+                border: "1px solid black",
+                maxWidth: "500px",
+                minHeight: 100,
+                position: "absolute",
+                top: 0,
+                textAlign: "center",
+                paddingTop: 43
+              }}
+            >
+              <p> click aqui ou pressione qualquer tecla</p>
+            </div>
+
+            <div
+              className="container mt-5 ml-0"
+              onClick={() => {
+                this.setState({ iniciado: true }), this.pickRandom();
+              }}
+              style={{
+                maxWidth: "500px",
+                minHeight: 100,
+
+                position: "absolute",
+                top: 0,
+                background: "#e3e1e1",
+                opacity: 1,
+                display: this.coverDisplay(),
+                fontSize: 30,
+                textAlign: "center",
+                paddingTop: 30
+              }}
+            >
+              <p> click aqui para começar</p>
+            </div>
           </div>
-        </div>
-        <div
-          id="click"
-          
-          className="container mt-5 ml-0"
-          style={{
-            border: "1px solid black",
-            maxWidth: "500px",
-            minHeight: 100
-          }}
-        >
-          click aqui ou digite qualquer teclas
         </div>
       </div>
     );
