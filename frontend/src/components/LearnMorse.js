@@ -78,85 +78,93 @@ class LearnMorse extends Component {
     element.addEventListener("touchstart", this.pressHandler);
   }
   pressHandler = e => {
-    this.setState({ key: e.key });
-    if (e) {
-      if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
-        e.preventDefault();
-        if (this.props.morse.start === 0) {
-          this.props.defHigh();
-          this.setState({ start: Date.now() });
+    if (this.state.iniciado) {
+
+
+      this.setState({ key: e.key });
+      if (e) {
+        if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
+          // e.preventDefault();
+          if (this.props.morse.start === 0) {
+            this.props.defHigh();
+            this.setState({ start: Date.now() });
+          }
         }
+      } else {
+        this.props.defHigh();
+        this.setState({ start: Date.now() });
       }
-    } else {
-      this.props.defHigh();
-      this.setState({ start: Date.now() });
     }
   };
   // se o marcado de tempo for true , o uphandler olha o  tmepo entre letra
   // caso contrario sempre marca o - ou.
   upHandler = e => {
-    if (
-      (this.state.tempo &&
-        this.state.start - this.state.end >
+    if (this.state.iniciado) {
+
+
+      if (
+        (this.state.tempo &&
+          this.state.start - this.state.end >
           this.props.morse.speed * 3 -
-            this.props.morse.speed * this.state.dificuldade &&
-        this.state.start - this.state.end <
+          this.props.morse.speed * this.state.dificuldade &&
+          this.state.start - this.state.end <
           this.props.morse.speed * 3 +
-            this.props.morse.speed * this.state.dificuldade) ||
-      this.state.start - this.state.end > 150000000 ||
-      this.state.start - this.state.end < -150000000 ||
-      this.state.lista.length === 0 ||
-      !this.state.tempo
-    ) {
-      if (e) {
-        e.preventDefault();
-        if (
-          e.key !== "Tab" &&
-          e.key !== "Alt" &&
-          !/^[0-9]$/i.test(e.key) &&
-          e.key === this.state.key
-        ) {
+          this.props.morse.speed * this.state.dificuldade) ||
+        this.state.start - this.state.end > 150000000 ||
+        this.state.start - this.state.end < -150000000 ||
+        this.state.lista.length === 0 ||
+        !this.state.tempo
+      ) {
+        if (e) {
+          // e.preventDefault();
+          if (
+            e.key !== "Tab" &&
+            e.key !== "Alt" &&
+            !/^[0-9]$/i.test(e.key) &&
+            e.key === this.state.key
+          ) {
+            setTimeout(() => this.props.defLow(), 15);
+            this.setState({ end: Date.now() });
+          }
+        } else {
           setTimeout(() => this.props.defLow(), 15);
           this.setState({ end: Date.now() });
         }
+        if (this.state.lista.length >= 4) {
+          this.setState({ lista: [] });
+        }
+
+        if (
+          (this.state.end - this.state.start >
+            this.props.morse.speed * 3 -
+            this.props.morse.speed * this.state.dificuldade &&
+            this.state.end - this.state.start <
+            this.props.morse.speed * 3 +
+            this.props.morse.speed * this.state.dificuldade) ||
+          //se o !this.state.tempo se for maior que 3x difuculdade
+          //sempre -
+          (!this.state.tempo &&
+            this.state.end - this.state.start >
+            this.props.morse.speed * 3 -
+            this.props.morse.speed * this.state.dificuldade)
+        ) {
+          this.setState({ lista: [...this.state.lista, "-"] });
+        } else if (
+          this.state.end - this.state.start <
+          this.props.morse.speed +
+          this.props.morse.speed * this.state.dificuldade ||
+          !this.state.tempo
+        ) {
+          this.setState({ lista: [...this.state.lista, "."] });
+        }
+        this.setState({ set: false, int: 0 });
       } else {
         setTimeout(() => this.props.defLow(), 15);
-        this.setState({ end: Date.now() });
-      }
-      if (this.state.lista.length >= 4) {
         this.setState({ lista: [] });
-      }
 
-      if (
-        (this.state.end - this.state.start >
-          this.props.morse.speed * 3 -
-            this.props.morse.speed * this.state.dificuldade &&
-          this.state.end - this.state.start <
-            this.props.morse.speed * 3 +
-              this.props.morse.speed * this.state.dificuldade) ||
-        //se o !this.state.tempo se for maior que 3x difuculdade
-        //sempre -
-        (!this.state.tempo &&
-          this.state.end - this.state.start >
-            this.props.morse.speed * 3 -
-              this.props.morse.speed * this.state.dificuldade)
-      ) {
-        this.setState({ lista: [...this.state.lista, "-"] });
-      } else if (
-        this.state.end - this.state.start <
-          this.props.morse.speed +
-            this.props.morse.speed * this.state.dificuldade ||
-        !this.state.tempo
-      ) {
-        this.setState({ lista: [...this.state.lista, "."] });
+        this.setState({ end: Date.now() });
+        this.setState({ end: 0 });
       }
-      this.setState({ set: false, int: 0 });
-    } else {
-      setTimeout(() => this.props.defLow(), 15);
-      this.setState({ lista: [] });
-
-      this.setState({ end: Date.now() });
-      this.setState({ end: 0 });
     }
   };
   play = () => {

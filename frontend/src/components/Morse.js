@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Volume from "./Volume";
+
 import {
   defHigh,
   defLow,
@@ -36,9 +36,14 @@ class Morse extends Component {
   upHandler = e => {
     this.setState({ iniciado: true });
     if (e) {
-      e.preventDefault();
-      console.log(e);
-      if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
+      // e.preventDefault();
+      console.log(e.key);
+      if (
+        e.key !== "Tab" &&
+        e.key !== "Alt" &&
+        !/^[0-9]$/i.test(e.key) &&
+        e.key !== "Backspace"
+      ) {
         setTimeout(() => this.props.defLow(), 50);
       }
     } else {
@@ -48,7 +53,7 @@ class Morse extends Component {
   pressHandler = e => {
     this.setState({ iniciado: true });
     if (e) {
-      e.preventDefault();
+      // e.preventDefault();
       console.log(e.key);
       if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
         // impede o evento de dar trigger em defHIgh se a tleca ja tiver sido apertada
@@ -80,9 +85,9 @@ class Morse extends Component {
   };
   morseDisplay = () => {
     if (this.state.displayMorse) {
-      return "none";
+      return "block";
     }
-    return "block";
+    return "none";
   };
   onChange = () => {};
   render() {
@@ -92,9 +97,9 @@ class Morse extends Component {
           clique na caixa ou aperte qualquer tecla para começar
         </div>
 
-        <div className="d-flex">
+        <div className="d-flex mt-2">
           <button
-            className="btn btn-outline-secondary btn-sm"
+            className="btn btn-outline-secondary btn-sm mr-2"
             onClick={() => this.props.resetLista()}
           >
             {" "}
@@ -103,7 +108,9 @@ class Morse extends Component {
           <input
             style={{ marginTop: "auto", marginBottom: "auto" }}
             type="checkbox"
-            value={this.state.displayMorse}
+            checked={this.state.displayMorse}
+            // className="onoffswitch-checkbox"
+            // value={this.state.displayMorse}
             onChange={() =>
               this.setState({
                 displayMorse: !this.state.displayMorse
