@@ -9,14 +9,15 @@ import {
   setPage
 } from "../actions/morseActions";
 import Popup from "reactjs-popup";
-import Icon from "@material-ui/core/Icon";
 
+import soundfile from "../assets/ding.mp3";
 class LearnMorse extends Component {
   constructor() {
     super();
     // criando a referencia pra adicionar e remover o eventelistener
     this.upHandler = this.upHandler.bind(this);
     this.pressHandler = this.pressHandler.bind(this);
+    this.audio = new Audio(soundfile);
   }
   state = {
     learn: "",
@@ -28,7 +29,8 @@ class LearnMorse extends Component {
     key: "",
     dificuldade: 2,
     tempo: false,
-    iniciado: false
+    iniciado: false,
+    level: 1
   };
 
   componentDidUpdate(prevP, prevS) {
@@ -48,12 +50,12 @@ class LearnMorse extends Component {
     });
     // compara se o codigo morse e a lista traduzida sao identicas
     //e escolhe um novo charact,e se forem difrente tbm
+
     if (
       prevS.lista.join(",") !== this.state.lista.join(",") &&
       this.state.cm.join(",") === this.state.lista.join(",") &&
       this.state.lista.join(",").length > 0
     ) {
-      console.log("rese");
       setTimeout(() => {
         this.pickRandom(), this.setState({ lista: [] });
         this.setState({ end: 0 });
@@ -79,12 +81,10 @@ class LearnMorse extends Component {
   }
   pressHandler = e => {
     if (this.state.iniciado) {
-
-
       this.setState({ key: e.key });
       if (e) {
         if (e.key !== "Tab" && e.key !== "Alt" && !/^[0-9]$/i.test(e.key)) {
-          // e.preventDefault();
+          e.preventDefault();
           if (this.props.morse.start === 0) {
             this.props.defHigh();
             this.setState({ start: Date.now() });
@@ -100,62 +100,72 @@ class LearnMorse extends Component {
   // caso contrario sempre marca o - ou.
   upHandler = e => {
     if (this.state.iniciado) {
-
-
       if (
         (this.state.tempo &&
           this.state.start - this.state.end >
-          this.props.morse.speed * 3 -
-          this.props.morse.speed * this.state.dificuldade &&
+            this.props.morse.speed * 3 -
+              this.props.morse.speed * this.state.dificuldade &&
           this.state.start - this.state.end <
-          this.props.morse.speed * 3 +
-          this.props.morse.speed * this.state.dificuldade) ||
+            this.props.morse.speed * 3 +
+              this.props.morse.speed * this.state.dificuldade) ||
         this.state.start - this.state.end > 150000000 ||
         this.state.start - this.state.end < -150000000 ||
         this.state.lista.length === 0 ||
         !this.state.tempo
       ) {
         if (e) {
-          // e.preventDefault();
+          //nao aciona os sons se as teclas forem numeros ou tab e alt
           if (
             e.key !== "Tab" &&
             e.key !== "Alt" &&
             !/^[0-9]$/i.test(e.key) &&
             e.key === this.state.key
           ) {
+            e.preventDefault();
             setTimeout(() => this.props.defLow(), 15);
             this.setState({ end: Date.now() });
           }
         } else {
+          //esse else serve para eventos que nao tem e tipo o mousdown e o mouseup
           setTimeout(() => this.props.defLow(), 15);
           this.setState({ end: Date.now() });
         }
+        //zera o a lista de - e . se for maior que 4
         if (this.state.lista.length >= 4) {
           this.setState({ lista: [] });
         }
-
+        //checa o tempo e a batida do codigo
+        //tambem ve se nao é numero ou tab e alt para adicionar as batidas na lsita de - e .
+        //redundante porem necessario :(
         if (
-          (this.state.end - this.state.start >
-            this.props.morse.speed * 3 -
-            this.props.morse.speed * this.state.dificuldade &&
+          e.key !== "Tab" &&
+          e.key !== "Alt" &&
+          !/^[0-9]$/i.test(e.key) &&
+          e.key === this.state.key
+        ) {
+          if (
+            (this.state.end - this.state.start >
+              this.props.morse.speed * 3 -
+                this.props.morse.speed * this.state.dificuldade &&
+              this.state.end - this.state.start <
+                this.props.morse.speed * 3 +
+                  this.props.morse.speed * this.state.dificuldade) ||
+            //se o !this.state.tempo se for maior que 3x difuculdade
+            //sempre -
+            (!this.state.tempo &&
+              this.state.end - this.state.start >
+                this.props.morse.speed * 3 -
+                  this.props.morse.speed * this.state.dificuldade)
+          ) {
+            this.setState({ lista: [...this.state.lista, "-"] });
+          } else if (
             this.state.end - this.state.start <
-            this.props.morse.speed * 3 +
-            this.props.morse.speed * this.state.dificuldade) ||
-          //se o !this.state.tempo se for maior que 3x difuculdade
-          //sempre -
-          (!this.state.tempo &&
-            this.state.end - this.state.start >
-            this.props.morse.speed * 3 -
-            this.props.morse.speed * this.state.dificuldade)
-        ) {
-          this.setState({ lista: [...this.state.lista, "-"] });
-        } else if (
-          this.state.end - this.state.start <
-          this.props.morse.speed +
-          this.props.morse.speed * this.state.dificuldade ||
-          !this.state.tempo
-        ) {
-          this.setState({ lista: [...this.state.lista, "."] });
+              this.props.morse.speed +
+                this.props.morse.speed * this.state.dificuldade ||
+            !this.state.tempo
+          ) {
+            this.setState({ lista: [...this.state.lista, "."] });
+          }
         }
         this.setState({ set: false, int: 0 });
       } else {
@@ -170,7 +180,7 @@ class LearnMorse extends Component {
   play = () => {
     var total = 0;
 
-    if (this.state.total === 0) {
+    if (this.state.total === 0 && this.state.level <= 2) {
       // this.props.createCTX();
 
       this.state.cm.map((obj, ind) => {
@@ -218,6 +228,7 @@ class LearnMorse extends Component {
       }
     }
     this.setState({ learn: learn });
+
     setTimeout(() => {
       this.play();
     }, 200);
@@ -248,25 +259,25 @@ class LearnMorse extends Component {
       <div>
         <div className="btn-group">
           <button
-            className="btn btn-outline-secondary btn-sm"
+            className=" btn btn-outline-secondary btn-sm"
             onClick={() => this.pickRandom()}
           >
             random
           </button>
 
           <button
-            className="btn btn-outline-secondary btn-sm"
+            className=" btn btn-outline-secondary btn-sm"
             onClick={() => {
               this.play();
             }}
           >
-            play
+            tocar
           </button>
           <Popup
             modal
-            contentStyle={{ maxWidth: 320, width: "30%" }}
+            contentStyle={{ maxWidth: 320, width: "100%" }}
             trigger={
-              <button className="btn btn-outline-secondary btn-sm">
+              <button className=" btn btn-outline-secondary btn-sm">
                 ajuda
               </button>
             }
@@ -296,12 +307,20 @@ class LearnMorse extends Component {
               </p>
             </div>
           </Popup>
+          {/* <select className="btn btn-outline-secondary btn-sm">
+            <option value="" disabled selected>
+              dificuldade
+            </option>
+            <option value="1">novato</option>
+            <option value="2">intermediário</option>
+            <option value="3">expert</option>
+          </select> */}
         </div>
 
         <p style={{ marginLeft: 10, fontSize: 50 }}>{this.state.learn}</p>
 
         <div style={{ width: "100% ", height: 25 }}>
-          <div style={{ position: "relative", marginLeft: "10px" }}>
+          <div style={{ position: "relative", marginLeft: "0px" }}>
             <div style={{ display: "flex", position: "absolute" }}>
               {this.state.lista.map((obj, ind) => {
                 if (obj === "-") {
@@ -339,35 +358,37 @@ class LearnMorse extends Component {
 
             <div style={{ position: "absolute", display: "flex" }}>
               {this.state.cm.map((obj, ind) => {
-                if (obj === "-") {
-                  return (
-                    <div
-                      key={ind}
-                      style={{
-                        width: 75,
-                        height: 25,
-                        backgroundColor: "rgba(255,255,255, 0.5)",
-                        marginLeft: "10px",
-                        border: "1px solid black",
-                        zIndex: 130
-                      }}
-                    />
-                  );
-                } else {
-                  return (
-                    <div
-                      key={ind}
-                      style={{
-                        width: 25,
-                        height: 25,
-                        borderRadius: "100%",
-                        backgroundColor: "rgba(255,255,255, 0.5)",
-                        marginLeft: "10px",
-                        border: "1px solid black",
-                        zIndex: 130
-                      }}
-                    />
-                  );
+                if (this.state.level === 1) {
+                  if (obj === "-") {
+                    return (
+                      <div
+                        key={ind}
+                        style={{
+                          width: 75,
+                          height: 25,
+                          backgroundColor: "rgba(255,255,255, 0.5)",
+                          marginLeft: "10px",
+                          border: "1px solid black",
+                          zIndex: 130
+                        }}
+                      />
+                    );
+                  } else {
+                    return (
+                      <div
+                        key={ind}
+                        style={{
+                          width: 25,
+                          height: 25,
+                          borderRadius: "100%",
+                          backgroundColor: "rgba(255,255,255, 0.5)",
+                          marginLeft: "10px",
+                          border: "1px solid black",
+                          zIndex: 130
+                        }}
+                      />
+                    );
+                  }
                 }
               })}
             </div>

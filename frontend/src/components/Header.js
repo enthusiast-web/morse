@@ -82,7 +82,7 @@ export default function appRouter() {
                   <Route path="/(learn|morse|lang)/" component={Volume} />
                 </div>
                 <div className="col-sm">
-                  <Route path="/(learn|morse|lang)/" component={Volume} />
+                  <Route path="/(learn|morse|lang)/" component={Speed} />
                 </div>
               </div>
             </div>

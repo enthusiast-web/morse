@@ -68,11 +68,11 @@ const initialState = {
 };
 
 // IMPORTANTE : espaço entre letras=450 ,entre palavras =1050,tempo do ponto =150 da barra 300
-export default function (state = initialState, action, dispatch) {
+export default function(state = initialState, action, dispatch) {
   switch (action.type) {
     case "CHANGE_SPEED":
       if (action.payload >= 500) {
-        action.payload = 500
+        action.payload = 500;
       }
       return {
         ...state,
@@ -107,6 +107,7 @@ export default function (state = initialState, action, dispatch) {
 
       return { ...state, oscillator: oscillator, gain: gain };
     //conecta o oscilator ao audixo.ctx.destination
+
     case "DEF_HIGH":
       var oscillator = state.oscillator;
 
