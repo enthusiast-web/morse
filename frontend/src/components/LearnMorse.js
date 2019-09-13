@@ -10,15 +10,22 @@ import {
 } from "../actions/morseActions";
 import Popup from "reactjs-popup";
 
-import soundfile from "../assets/ding.mp3";
 class LearnMorse extends Component {
   constructor() {
     super();
     // criando a referencia pra adicionar e remover o eventelistener
     this.upHandler = this.upHandler.bind(this);
     this.pressHandler = this.pressHandler.bind(this);
-    this.audio = new Audio(soundfile);
+
+    this.context = new AudioContext();
+    this.audio = new Audio();
+    this.audio.src = "../static/rigth.mp3";
+    this.audio.controls = true;
+    this.audioWrong = new Audio();
+    this.audioWrong.src = "../static/wrong.mp3";
+    this.audioWrong.controls = true;
   }
+
   state = {
     learn: "",
     cm: [],
@@ -41,6 +48,11 @@ class LearnMorse extends Component {
             this.state.lista[ind] !== this.state.cm[ind] ||
             (this.state.start - this.state.end > 1400 && this.state.tempo)
           ) {
+            console.log(this.state.lista[ind], this.state.cm[ind]);
+
+            if (prevS.lista !== this.state.lista) {
+              this.audioWrong.play();
+            }
             setTimeout(() => {
               this.setState({ lista: [] });
             }, 500);
@@ -60,17 +72,20 @@ class LearnMorse extends Component {
         this.pickRandom(), this.setState({ lista: [] });
         this.setState({ end: 0 });
       }, 600);
+      this.audio.play();
       return;
     } else if (this.state.lista.length === 5) {
       setTimeout(() => {
         this.pickRandom(), this.setState({ lista: [] });
       }, 600);
+      this.audio.play();
       return;
     }
   }
 
   componentDidMount() {
     // this.pickRandom();
+
     var element = document.getElementById("click");
     window.addEventListener("keypress", this.pressHandler);
     window.addEventListener("keyup", this.upHandler);
@@ -169,7 +184,7 @@ class LearnMorse extends Component {
         }
         this.setState({ set: false, int: 0 });
       } else {
-        setTimeout(() => this.props.defLow(), 15);
+        this.props.defLow();
         this.setState({ lista: [] });
 
         this.setState({ end: Date.now() });
@@ -234,8 +249,9 @@ class LearnMorse extends Component {
     }, 200);
   };
   onChange = e => {
-    // console.log(e.target.name, e.target.value);
+    console.log(e.target.name, e.target.value);
     this.setState({ [e.target.name]: e.target.value });
+    console.log(this.state.level);
   };
   componentWillUnmount() {
     // console.log("abc");
@@ -260,15 +276,14 @@ class LearnMorse extends Component {
         <div className="btn-group">
           <button
             className=" btn btn-outline-secondary btn-sm"
-            onClick={() => this.pickRandom()}
-          >
-            random
-          </button>
-
-          <button
-            className=" btn btn-outline-secondary btn-sm"
             onClick={() => {
-              this.play();
+              if (this.level != 3) this.play();
+              else {
+                <Popup modal>
+                  {" "}
+                  no nivel expert nao se pode tocar o codigo
+                </Popup>;
+              }
             }}
           >
             tocar
@@ -292,29 +307,29 @@ class LearnMorse extends Component {
             >
               <h3> ajuda</h3>
               <p>
-                click na caixa ou aperte qualquer tecla no tempo correto para
-                realizar o codigo morse, apertar por mais tempo resulta em um
-                traço e em menos tempo resulta em um ponto
+                Clique na caixa ou aperte qualquer tecla, apertar por mais tempo
+                resulta em um traço e por menos tempo resulta em um ponto.
               </p>
               <p>
                 Os traços e pontos embaixo da letra representam essa letra em
-                codigo morse
+                codigo morse.
               </p>
               <p>
-                {" "}
-                replique o som que foi reproduzido para aprender as letras do
-                morse
+                Replique o som que foi reproduzido para aprender as letras do
+                morse.
               </p>
             </div>
           </Popup>
-          {/* <select className="btn btn-outline-secondary btn-sm">
-            <option value="" disabled selected>
-              dificuldade
-            </option>
+          <select
+            name="level"
+            value={this.level}
+            className="btn btn-outline-secondary btn-sm"
+            onChange={this.onChange}
+          >
             <option value="1">novato</option>
             <option value="2">intermediário</option>
             <option value="3">expert</option>
-          </select> */}
+          </select>
         </div>
 
         <p style={{ marginLeft: 10, fontSize: 50 }}>{this.state.learn}</p>
@@ -323,42 +338,44 @@ class LearnMorse extends Component {
           <div style={{ position: "relative", marginLeft: "0px" }}>
             <div style={{ display: "flex", position: "absolute" }}>
               {this.state.lista.map((obj, ind) => {
-                if (obj === "-") {
-                  return (
-                    <div
-                      key={ind}
-                      style={{
-                        width: 75,
+                if (this.state.level < 3) {
+                  if (obj === "-") {
+                    return (
+                      <div
+                        key={ind}
+                        style={{
+                          width: 75,
 
-                        height: 25,
-                        background: "green",
-                        marginLeft: "10px",
-                        zIndex: 120
-                      }}
-                    />
-                  );
-                } else {
-                  return (
-                    <div
-                      key={ind}
-                      style={{
-                        width: 25,
+                          height: 25,
+                          background: "green",
+                          marginLeft: "10px",
+                          zIndex: 120
+                        }}
+                      />
+                    );
+                  } else {
+                    return (
+                      <div
+                        key={ind}
+                        style={{
+                          width: 25,
 
-                        height: 25,
-                        borderRadius: "100%",
-                        background: "green",
-                        marginLeft: "10px",
-                        zIndex: 120
-                      }}
-                    />
-                  );
+                          height: 25,
+                          borderRadius: "100%",
+                          background: "green",
+                          marginLeft: "10px",
+                          zIndex: 120
+                        }}
+                      />
+                    );
+                  }
                 }
               })}
             </div>
 
             <div style={{ position: "absolute", display: "flex" }}>
               {this.state.cm.map((obj, ind) => {
-                if (this.state.level === 1) {
+                if (this.state.level < 2) {
                   if (obj === "-") {
                     return (
                       <div
