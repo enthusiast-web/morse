@@ -15,7 +15,7 @@ export default function appRouter() {
     position: "absolute"
   };
   return (
-    <div>
+    <div style={{ height: "100%", width: "100%" }}>
       <Router>
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
           <a className="navbar-brand">Morse.js</a>

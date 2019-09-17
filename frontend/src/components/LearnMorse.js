@@ -20,6 +20,7 @@ class LearnMorse extends Component {
     this.context = new AudioContext();
     this.audio = new Audio();
     this.audio.src = "../static/rigth.mp3";
+
     this.audio.controls = true;
     this.audioWrong = new Audio();
     this.audioWrong.src = "../static/wrong.mp3";
@@ -51,7 +52,10 @@ class LearnMorse extends Component {
             console.log(this.state.lista[ind], this.state.cm[ind]);
 
             if (prevS.lista !== this.state.lista) {
-              this.audioWrong.play();
+              setTimeout(() => {
+                this.audioWrong.volume = this.props.morse.volume;
+                this.audioWrong.play();
+              }, 100);
             }
             setTimeout(() => {
               this.setState({ lista: [] });
@@ -71,14 +75,21 @@ class LearnMorse extends Component {
       setTimeout(() => {
         this.pickRandom(), this.setState({ lista: [] });
         this.setState({ end: 0 });
-      }, 600);
-      this.audio.play();
+      }, 700);
+      this.audio.volume = this.props.morse.volume;
+      setTimeout(() => {
+        this.audio.play();
+      }, 100);
+
       return;
     } else if (this.state.lista.length === 5) {
       setTimeout(() => {
         this.pickRandom(), this.setState({ lista: [] });
-      }, 600);
-      this.audio.play();
+      }, 700);
+      this.audio.volume = this.props.morse.volume;
+      setTimeout(() => {
+        this.audio.play();
+      }, 100);
       return;
     }
   }

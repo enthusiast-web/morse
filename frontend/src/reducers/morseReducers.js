@@ -6,8 +6,8 @@ const initialState = {
   space: "",
   lista: [],
   oscillator: "",
-  speed: 100,
-  volume: 0.9,
+  speed: 130,
+  volume: 0.6,
   letras: {
     "0": "-----",
     "1": ".----",
