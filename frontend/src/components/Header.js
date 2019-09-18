@@ -18,7 +18,9 @@ export default function appRouter() {
     <div style={{ height: "100%", width: "100%" }}>
       <Router>
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
-          <a className="navbar-brand">Morse.js</a>
+          <a style={{ color: "#3297a8" }} href="../" className="navbar-brand">
+            Morse.js
+          </a>
           <button
             className="navbar-toggler"
             type="button"
